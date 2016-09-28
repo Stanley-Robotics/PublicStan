@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<robot>
+
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/robot_gazebo</robotNamespace>
+        </plugin>
+    </gazebo>
+
+    <gazebo reference="left_wheel">
+        <mu1>2147483647</mu1>
+        <mu2>2147483647</mu2>
+    </gazebo>
+
+    <gazebo reference="right_wheel">
+        <mu1>2147483647</mu1>
+        <mu2>2147483647</mu2>
+    </gazebo>
+
+    <gazebo reference="caster_0_left">
+        <mu1>1000</mu1>
+        <mu2>1000</mu2>
+    </gazebo>
+    <gazebo reference="caster_1_left">
+        <mu1>1000</mu1>
+        <mu2>1000</mu2>
+    </gazebo>
+    <gazebo reference="caster_0_right">
+        <mu1>1000</mu1>
+        <mu2>1000</mu2>
+    </gazebo>
+    <gazebo reference="caster_1_right">
+        <mu1>1000</mu1>
+        <mu2>1000</mu2>
+    </gazebo>
+
+<!-- export robot odometry to tf -->
+<gazebo>
+      <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>50.0</updateRate>
+        <bodyName>base_footprint</bodyName>
+        <topicName>odom_ground_truth</topicName>
+        <gaussianNoise>0.00</gaussianNoise>
+        <frameName>world</frameName>
+        <xyzOffsets>0 0 0</xyzOffsets>
+        <rpyOffsets>0 0 0</rpyOffsets>
+      </plugin>
+    </gazebo>
+
+
+</robot>

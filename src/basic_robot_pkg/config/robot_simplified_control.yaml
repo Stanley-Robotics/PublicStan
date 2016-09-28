@@ -1,0 +1,29 @@
+robot_gazebo:
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  # Position Controllers ---------------------------------------
+  # controller for angular position of the wheel
+  left_wheel_steering_controller:
+    type: velocity_controllers/JointPositionController
+    joint: base_link_to_bottom_motor_left
+    pid: {p: 10.0, i: 0.00, d: 0.0}
+
+  right_wheel_steering_controller:
+    type: velocity_controllers/JointPositionController
+    joint: base_link_to_bottom_motor_right
+    pid: {p: 10.0, i: 0.00, d: 0.0}
+
+  right_wheel_power_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: bottom_motor_right_to_right_wheel
+
+  left_wheel_power_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: bottom_motor_left_to_left_wheel
+
+  central_cylinder_controller:
+    type: velocity_controllers/JointPositionController
+    joint: mobile_frame_to_trolley_top
+    pid: {p: 10.0, i: 0.00, d: 0.0}

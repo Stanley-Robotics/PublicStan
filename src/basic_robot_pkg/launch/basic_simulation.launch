@@ -1,0 +1,28 @@
+<launch>
+	<include file="$(find basic_robot_pkg)/launch/gazebo_empty_world.launch"/>
+	<include file="$(find basic_robot_pkg)/launch/robot_simplified_into_gazebo.launch"/>
+	 <!-- load the controllers -->
+        <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+                ns="/robot_gazebo" args="--shutdown-timeout 1
+                joint_state_controller
+                left_wheel_steering_controller
+                right_wheel_steering_controller
+                right_wheel_power_controller
+                left_wheel_power_controller
+                central_cylinder_controller
+                "/>
+	<!-- Load joint controller configurations from YAML file to parameter server -->
+        <rosparam file="$(find basic_robot_pkg)/config/robot_simplified_control.yaml" command="load"/>
+
+        <!-- virtual wheel joint should not be handled by gazebo, but the tf need to be there, so we use a joint state
+        publisher that handle tf publication for joint not in robot_gazebo/joint_states -->
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+                <param name="/use_gui" value="false"/>
+                <rosparam param="/source_list">["/robot_gazebo/joint_states", "/virtual/joint_states"]</rosparam>
+        </node>
+	<!-- convert joint states to TF transforms for rviz, etc -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+	respawn="false" output="screen">
+	<remap from="/joint_states" to="/joint_states" />
+	</node>
+</launch>

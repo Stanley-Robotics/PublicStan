@@ -1,0 +1,657 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz"
+    xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model"
+    xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+    xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
+    xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom"
+    xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint"
+    xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+    xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+    xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
+    xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
+    xmlns:xacro="http://www.ros.org/wiki/xacro"
+    name="simple_robot">
+
+    <xacro:include filename="$(find basic_robot_pkg)/urdf/robot_simplified.gazebo" />
+
+    <!-- Physical Constant Macros -->
+    <xacro:property name="PI" value="3.1415926535897931" />
+
+    <!-- Dimension Macros -->
+    <xacro:property name="wheelRadius" value="0.127" />
+    <xacro:property name="wheelWidth" value="0.1" />
+    <xacro:property name="wheelWeight" value="10" />
+
+    <xacro:property name="casterWheelRadius" value="0.041" />
+    <xacro:property name="casterWheelWidth" value="0.041" />
+    <xacro:property name="casterWheelWeight" value="4" />
+
+    <xacro:property name="baseWeight" value="700" />
+    <xacro:property name="baseWidth" value="1.36" />
+    <xacro:property name="baseHeight" value="1.07" />
+    <xacro:property name="baseDepth" value="0.4" />
+
+    <xacro:property name="bottomMotorWeight" value="70" />
+    <xacro:property name="bottomMotorWidth" value="0.176" />
+    <xacro:property name="bottomMotorHeight" value="0.325" />
+    <xacro:property name="bottomMotorDepth" value="0.258" />
+
+    <xacro:property name="mobileFrameWeight" value="400" />
+    <xacro:property name="mobileFrameWidth" value="0.992" />
+    <xacro:property name="mobileFrameHeight" value="0.075" />
+    <xacro:property name="mobileFrameDepth" value="2.638" />
+
+    <xacro:property name="trolleyTopWeight" value="200" />
+    <xacro:property name="trolleyTopWidth" value="0.992" />
+    <xacro:property name="trolleyTopHeight" value="0.075" />
+    <xacro:property name="trolleyTopDepth" value="1.417" />
+
+    <xacro:property name="trolleyBottomWeight" value="60" />
+    <xacro:property name="trolleyBottomWidth" value="0.978" />
+    <xacro:property name="trolleyBottomHeight" value="0.067" />
+    <xacro:property name="trolleyBottomDepth" value="0.382" />
+    
+    <xacro:property name="wheelsAxleSpacing" value="1.680" />
+    <xacro:property name="castersAxleSpacing" value="0.861" />
+    <xacro:property name="castersSpaceFrontRear" value="0.09" />
+    <xacro:property name="distanceToTheGround" value="0.01" />
+    <xacro:property name="distanceFromTrolleyTopToTrolleyBottom" value="0.1525" />
+    <xacro:property name="heightCasterWheels" value="${-trolleyTopHeight/2.0 - distanceToTheGround + casterWheelRadius}" />
+
+    <!-- Physical Physics Macros -->
+    <xacro:property name="maxInt" value="2147483647" />
+    <xacro:property name="PROPULSION_MAX_VELOCITY" value="1.00"/> <!-- radians/sec -->
+    <xacro:property name="PROPULSION_MAX_EFFORT" value="10000"/>
+    <xacro:property name="DIRECTION_MAX_VELOCITY" value="1.57"/> <!-- radian/sec -->
+    <xacro:property name="DIRECTION_MAX_EFFORT" value="10000000000"/>
+    <xacro:property name="ELEVATION_MAX_EFFORT" value="40000"/>
+    <xacro:property name="ELEVATION_MAX_VELOCITY" value="1"/>
+    <xacro:property name="EXTEND_MAX_EFFORT" value="1000000"/>
+    <xacro:property name="EXTEND_MAX_VELOCITY" value="0.06"/>
+    <xacro:property name="ROULETTE_MAX_EFFORT" value="800"/>
+    <xacro:property name="ROULETTE_MAX_VELOCITY" value="100"/>
+
+
+    <!-- Physical Material Macros -->
+    <material name="Red">
+    	<color rgba="1.0 0 0 1.0"/>
+    </material>
+    <material name="Green">
+    	<color rgba="0 1.0 0 1.0"/>
+    </material>
+    <material name="Blue">
+    	<color rgba="0 0 1.0 0.5"/>
+    </material>
+    <material name="Black">
+    	<color rgba="0 0 0 1.0"/>
+    </material>
+    <material name="Aqua">
+    	<color rgba="0 255 255 1.0"/>
+    </material>
+
+<link name="base_footprint">
+        <visual>
+    <origin xyz="0 0 ${distanceToTheGround}" rpy="0 0 0" />
+    <geometry>
+        <box size="0.001 0.001 0.001" />
+    </geometry>
+</visual>
+
+<inertial>
+<origin
+        xyz="0 0.0 0"
+        rpy="0 0 0" />
+<mass
+        value="0.0001" />
+<inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+</inertial>
+
+</link>
+
+
+<joint name="base_link_joint" type="fixed">
+        <origin xyz="0 0 ${baseHeight/2+distanceToTheGround}" rpy="0 0 0" />
+        <parent link="base_footprint"/>
+        <child link="base_link" />
+</joint>
+<gazebo reference="base_link_joint">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+    <link name="base_link">
+        <inertial>
+            <mass value="${baseWeight}" />
+            <origin xyz="0 0 0" /> 
+            <inertia  ixx="${baseWeight*1.0/12.0*(baseWidth*baseWidth + baseHeight*baseHeight)}" ixy="0.0"  ixz="0.0"  iyy="${baseWeight*1.0/12.0*(baseDepth*baseDepth + baseHeight*baseHeight)}"  iyz="0.0"  izz="${baseWeight*1.0/12.0*(baseWidth*baseWidth + baseDepth*baseDepth)}" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="${baseDepth} ${baseWidth} ${baseHeight}" />
+            </geometry>
+            <material name="Black"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="${baseDepth} ${baseWidth} ${baseHeight}" />
+            </geometry>
+        </collision>
+    </link>
+    <gazebo reference="base_link">
+        <material>Gazebo/Black</material>
+    </gazebo>
+
+<joint name="base_link_to_bottom_motor_left" type="continuous">
+    <parent link="base_link"/>
+    <child link="bottom_motor_left"/>
+    <origin xyz="0.0 ${-baseWidth/2.0 - wheelRadius} ${-baseHeight/2.0 - distanceToTheGround + wheelRadius + bottomMotorHeight/2.0}"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-maxInt}" upper="${maxInt}" effort="${DIRECTION_MAX_EFFORT}" velocity="${DIRECTION_MAX_VELOCITY}" />
+</joint>
+<gazebo reference="base_link_to_bottom_motor_left">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="bottom_motor_left">
+    <inertial>
+        <mass value="${bottomMotorWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${bottomMotorWeight*1.0/12.0*(bottomMotorWidth*bottomMotorWidth + bottomMotorHeight*bottomMotorHeight)}" ixy="0.0"  ixz="0.0"  iyy="${bottomMotorWeight*1.0/12.0*(bottomMotorDepth*bottomMotorDepth + bottomMotorHeight*bottomMotorHeight)}"  iyz="0.0"  izz="${bottomMotorWeight*1.0/12.0*(bottomMotorWidth*bottomMotorWidth + bottomMotorDepth*bottomMotorDepth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${bottomMotorDepth} ${bottomMotorWidth} ${bottomMotorHeight}" />
+        </geometry>
+        <material name="Black"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${bottomMotorDepth} ${bottomMotorWidth} ${bottomMotorHeight}" />
+        </geometry>
+    </collision>
+</link>
+<gazebo reference="bottom_motor_left">
+    <material>Gazebo/Black</material>
+</gazebo>
+
+<joint name="bottom_motor_left_to_left_wheel" type="continuous">
+    <parent link="bottom_motor_left"/>
+    <child link="left_wheel"/>
+    <origin xyz="0.0 0.0 ${-bottomMotorHeight/2.0}"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="0" upper="0" effort="${PROPULSION_MAX_EFFORT}" velocity="${PROPULSION_MAX_VELOCITY}" />
+</joint>
+<gazebo reference="bottom_motor_left_to_left_wheel">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="left_wheel">
+    <inertial>
+        <mass value="${wheelWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${wheelWeight*1.0/12.0*(3*wheelRadius*wheelRadius + wheelWidth*wheelWidth)}" ixy="0.0"  ixz="0.0"  iyy="${wheelWeight/2.0*(wheelRadius*wheelRadius)}"  iyz="0.0"  izz="${wheelWeight*1.0/12.0*(3*wheelRadius*wheelRadius + wheelWidth*wheelWidth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${wheelRadius}" length="${wheelWidth}" />
+        </geometry>
+        <material name="Green"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${wheelRadius}" length="${wheelWidth}" />
+        </geometry>
+    </collision>
+</link>
+<gazebo reference="left_wheel">
+    <material>Gazebo/Green</material>
+</gazebo>
+
+<joint name="base_link_to_bottom_motor_right" type="continuous">
+    <parent link="base_link"/>
+    <child link="bottom_motor_right"/>
+    <origin xyz="0.0 ${baseWidth/2.0 + wheelRadius} ${-baseHeight/2.0 - distanceToTheGround + wheelRadius + bottomMotorHeight/2.0}"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-maxInt}" upper="${maxInt}" effort="${DIRECTION_MAX_EFFORT}" velocity="${DIRECTION_MAX_VELOCITY}" />
+</joint>
+<gazebo reference="base_link_to_bottom_motor_right">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="bottom_motor_right">
+    <inertial>
+        <mass value="${bottomMotorWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${bottomMotorWeight*1.0/12.0*(bottomMotorWidth*bottomMotorWidth + bottomMotorHeight*bottomMotorHeight)}" ixy="0.0"  ixz="0.0"  iyy="${bottomMotorWeight*1.0/12.0*(bottomMotorDepth*bottomMotorDepth+ bottomMotorHeight*bottomMotorHeight)}"  iyz="0.0"  izz="${bottomMotorWeight*1.0/12.0*(bottomMotorWidth*bottomMotorWidth + bottomMotorDepth*bottomMotorDepth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${bottomMotorDepth} ${bottomMotorWidth} ${bottomMotorHeight}" />
+        </geometry>
+        <material name="Black"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${bottomMotorDepth} ${bottomMotorWidth} ${bottomMotorHeight}" />
+        </geometry>
+    </collision>
+</link>
+<gazebo reference="bottom_motor_right">
+    <material>Gazebo/Black</material>
+</gazebo>
+
+<joint name="bottom_motor_right_to_right_wheel" type="continuous">
+    <parent link="bottom_motor_right"/>
+    <child link="right_wheel"/>
+    <origin xyz="0.0 0.0 ${-bottomMotorHeight/2.0}"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="0" upper="0" effort="${PROPULSION_MAX_EFFORT}" velocity="${PROPULSION_MAX_VELOCITY}" />
+</joint>
+<gazebo reference="bottom_motor_right_to_right_wheel">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="right_wheel">
+    <inertial>
+        <mass value="${wheelWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${wheelWeight*1.0/12.0*(3*wheelRadius*wheelRadius + wheelWidth*wheelWidth)}" ixy="0.0"  ixz="0.0"  iyy="${wheelWeight/2.0*(wheelRadius*wheelRadius)}"  iyz="0.0"  izz="${wheelWeight*1.0/12.0*(3*wheelRadius*wheelRadius + wheelWidth*wheelWidth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${wheelRadius}" length="${wheelWidth}" />
+        </geometry>
+        <material name="Green"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${wheelRadius}" length="${wheelWidth}" />
+        </geometry>
+    </collision>
+</link>
+<gazebo reference="right_wheel">
+    <material>Gazebo/Green</material>
+</gazebo>
+
+<joint name="base_link_to_mobile_frame" type="fixed">
+    <parent link="base_link"/>
+    <child link="mobile_frame"/>
+    <origin xyz="${baseDepth/2.0 + mobileFrameDepth/2.0} 0.0 ${-baseHeight/2.0 + mobileFrameHeight/2.0}"/>
+</joint>
+<gazebo reference="base_link_to_mobile_frame">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="mobile_frame">
+    <inertial>
+        <mass value="${mobileFrameWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${mobileFrameWeight*1.0/12.0*(mobileFrameWidth*mobileFrameWidth + mobileFrameHeight*mobileFrameHeight)}" ixy="0.0"  ixz="0.0"  iyy="${mobileFrameWeight*1.0/12.0*(mobileFrameDepth*mobileFrameDepth + mobileFrameHeight*mobileFrameHeight)}"  iyz="0.0"  izz="${mobileFrameWeight*1.0/12.0*(mobileFrameWidth*mobileFrameWidth + mobileFrameDepth*mobileFrameDepth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${mobileFrameDepth} ${mobileFrameWidth} ${mobileFrameHeight}" />
+        </geometry>
+        <material name="Blue"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${mobileFrameDepth} ${mobileFrameWidth} ${mobileFrameHeight}" />
+        </geometry>
+    </collision>
+</link>
+<gazebo reference="mobile_frame">
+    <material>Gazebo/Blue</material>
+</gazebo>
+
+
+<joint name="mobile_frame_to_trolley_top" type="prismatic">
+    <parent link="mobile_frame"/>
+    <child link="trolley_top"/>
+    <origin xyz="${mobileFrameDepth/2.0 + trolleyTopDepth/2.0} 0.0 0.0"/>
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="1.8" effort="${EXTEND_MAX_EFFORT}" velocity="${EXTEND_MAX_VELOCITY}" />
+</joint>
+<gazebo reference="mobile_frame_to_trolley_top">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="trolley_top">
+    <inertial>
+        <mass value="${trolleyTopWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${trolleyTopWeight*1.0/12.0*(trolleyTopWidth*trolleyTopWidth + trolleyTopHeight*trolleyTopHeight)}" ixy="0.0"  ixz="0.0"  iyy="${trolleyTopWeight*1.0/12.0*(trolleyTopDepth*trolleyTopDepth + trolleyTopHeight*trolleyTopHeight)}"  iyz="0.0"  izz="${trolleyTopWeight*1.0/12.0*(trolleyTopWidth*trolleyTopWidth + trolleyTopDepth*trolleyTopDepth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${trolleyTopDepth} ${trolleyTopWidth} ${trolleyTopHeight}" />
+        </geometry>
+        <material name="Black"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${trolleyTopDepth} ${trolleyTopWidth} ${trolleyTopHeight}" />
+        </geometry>
+    </collision>
+</link>
+<gazebo reference="trolley_top">
+    <material>Gazebo/Black</material>
+</gazebo>
+
+<joint name="trolley_top_to_trolley_bottom" type="fixed">
+    <parent link="trolley_top"/>
+    <child link="trolley_bottom"/>
+    <origin xyz="${-distanceFromTrolleyTopToTrolleyBottom} 0.0 0.0"/>
+</joint>
+<gazebo reference="trolley_top_to_trolley_bottom">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="trolley_bottom">
+    <inertial>
+        <mass value="${trolleyBottomWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${trolleyBottomWeight*1.0/12.0*(trolleyBottomWidth*trolleyBottomWidth + trolleyBottomHeight*trolleyBottomHeight)}" ixy="0.0"  ixz="0.0"  iyy="${trolleyBottomWeight*1.0/12.0*(trolleyBottomDepth*trolleyBottomDepth + trolleyBottomHeight*trolleyBottomHeight)}"  iyz="0.0"  izz="${trolleyBottomWeight*1.0/12.0*(trolleyBottomWidth*trolleyBottomWidth + trolleyBottomDepth*trolleyBottomDepth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${trolleyBottomDepth} ${trolleyBottomWidth} ${trolleyBottomHeight}" />
+        </geometry>
+        <material name="Blue"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${trolleyBottomDepth} ${trolleyBottomWidth} ${trolleyBottomHeight}" />
+        </geometry>
+    </collision>
+</link>
+<gazebo reference="trolley_Bottom">
+    <material>Gazebo/Blue</material>
+</gazebo>
+
+<joint name="trolley_bottom_to_caster_0_left" type="continuous">
+    <parent link="trolley_bottom"/>
+    <child link="caster_0_left"/>
+    <origin xyz="${-castersSpaceFrontRear/2.0} ${-castersAxleSpacing/2.0} ${heightCasterWheels}"/>
+    <axis xyz="0 1 0" />
+    <limit effort="${ROULETTE_MAX_EFFORT}" velocity="${ROULETTE_MAX_VELOCITY}"/>
+</joint>
+<gazebo reference="trolley_bottom_to_caster_0_left">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="caster_0_left">
+    <inertial>
+        <mass value="${casterWheelWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${casterWheelWeight*1.0/12.0*(3*casterWheelRadius*casterWheelRadius + casterWheelWidth*casterWheelWidth)}" ixy="0.0"  ixz="0.0"  iyy="${casterWheelWeight/2.0*(casterWheelRadius*casterWheelRadius)}"  iyz="0.0"  izz="${casterWheelWeight*1.0/12.0*(3*casterWheelRadius*casterWheelRadius + casterWheelWidth*casterWheelWidth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${casterWheelRadius}" length="${casterWheelWidth}" />
+        </geometry>
+        <material name="Green"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${casterWheelRadius}" length="${casterWheelWidth}" />
+        </geometry>
+    </collision>
+</link>
+
+<gazebo reference="caster_0_left">
+    <material>Gazebo/Green</material>
+</gazebo>
+
+<joint name="trolley_bottom_to_caster_1_left" type="continuous">
+    <parent link="trolley_bottom"/>
+    <child link="caster_1_left"/>
+    <origin xyz="${castersSpaceFrontRear/2.0} ${-castersAxleSpacing/2.0} ${heightCasterWheels}"/>
+    <axis xyz="0 1 0" />
+    <limit effort="${ROULETTE_MAX_EFFORT}" velocity="${ROULETTE_MAX_VELOCITY}"/>
+</joint>
+<gazebo reference="trolley_bottom_to_caster_1_left">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="caster_1_left">
+    <inertial>
+        <mass value="${casterWheelWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${casterWheelWeight*1.0/12.0*(3*casterWheelRadius*casterWheelRadius + casterWheelWidth*casterWheelWidth)}" ixy="0.0"  ixz="0.0"  iyy="${casterWheelWeight/2.0*(casterWheelRadius*casterWheelRadius)}"  iyz="0.0"  izz="${casterWheelWeight*1.0/12.0*(3*casterWheelRadius*casterWheelRadius + casterWheelWidth*casterWheelWidth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${casterWheelRadius}" length="${casterWheelWidth}" />
+        </geometry>
+        <material name="Green"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${casterWheelRadius}" length="${casterWheelWidth}" />
+        </geometry>
+    </collision>
+</link>
+
+<gazebo reference="caster_1_left">
+    <material>Gazebo/Green</material>
+</gazebo>
+
+<joint name="trolley_bottom_to_caster_0_right" type="continuous">
+    <parent link="trolley_bottom"/>
+    <child link="caster_0_right"/>
+    <origin xyz="${-castersSpaceFrontRear/2.0} ${castersAxleSpacing/2.0} ${heightCasterWheels}"/>
+    <axis xyz="0 1 0" />
+    <limit effort="${ROULETTE_MAX_EFFORT}" velocity="${ROULETTE_MAX_VELOCITY}"/>
+</joint>
+<gazebo reference="trolley_bottom_to_caster_0_right">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="caster_0_right">
+    <inertial>
+        <mass value="${casterWheelWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${casterWheelWeight*1.0/12.0*(3*casterWheelRadius*casterWheelRadius + casterWheelWidth*casterWheelWidth)}" ixy="0.0"  ixz="0.0"  iyy="${casterWheelWeight/2.0*(casterWheelRadius*casterWheelRadius)}"  iyz="0.0"  izz="${casterWheelWeight*1.0/12.0*(3*casterWheelRadius*casterWheelRadius + casterWheelWidth*casterWheelWidth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${casterWheelRadius}" length="${casterWheelWidth}" />
+        </geometry>
+        <material name="Green"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${casterWheelRadius}" length="${casterWheelWidth}" />
+        </geometry>
+    </collision>
+</link>
+
+<gazebo reference="caster_0_right">
+    <material>Gazebo/Green</material>
+</gazebo>
+
+<joint name="trolley_bottom_to_caster_1_right" type="continuous">
+    <parent link="trolley_bottom"/>
+    <child link="caster_1_right"/>
+    <origin xyz="${castersSpaceFrontRear/2.0} ${castersAxleSpacing/2.0} ${heightCasterWheels}"/>
+    <axis xyz="0 1 0" />
+    <limit effort="${ROULETTE_MAX_EFFORT}" velocity="${ROULETTE_MAX_VELOCITY}"/>
+</joint>
+<gazebo reference="trolley_bottom_to_caster_1_right">
+  <disableFixedJointLumping>true</disableFixedJointLumping>
+</gazebo>
+
+<link name="caster_1_right">
+    <inertial>
+        <mass value="${casterWheelWeight}" />
+        <origin xyz="0 0 0" />
+        <inertia  ixx="${casterWheelWeight*1.0/12.0*(3*casterWheelRadius*casterWheelRadius + casterWheelWidth*casterWheelWidth)}" ixy="0.0"  ixz="0.0"  iyy="${casterWheelWeight/2.0*(casterWheelRadius*casterWheelRadius)}"  iyz="0.0"  izz="${casterWheelWeight*1.0/12.0*(3*casterWheelRadius*casterWheelRadius + casterWheelWidth*casterWheelWidth)}" />
+    </inertial>
+    <visual>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${casterWheelRadius}" length="${casterWheelWidth}" />
+        </geometry>
+        <material name="Green"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0" />
+        <geometry>
+            <cylinder radius="${casterWheelRadius}" length="${casterWheelWidth}" />
+        </geometry>
+    </collision>
+</link>
+
+<gazebo reference="caster_1_right">
+    <material>Gazebo/Green</material>
+</gazebo>
+
+<!-- virtual joint/link used for the control -->
+<link name="virtual_middle_engine">
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="0.001 0.001 0.001" />
+        </geometry>
+    </visual>
+    <inertial>
+        <origin xyz="0 0.0 0" rpy="0 0 0" />
+        <mass value="0.01" />
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+</link>
+
+<joint name="base_link_to_virtual_middle_engine" type="continuous">
+  <origin xyz="0 0.0 ${-baseHeight/2.0 - distanceToTheGround + wheelRadius + bottomMotorHeight/2.0}" rpy="0 0 0" />
+  <parent link="base_link" />
+  <child link="virtual_middle_engine" />
+  <axis xyz="0 0 1" />
+  <limit lower="${-maxInt}" upper="${maxInt}" effort="${DIRECTION_MAX_EFFORT}" velocity="${DIRECTION_MAX_VELOCITY}" />
+</joint>
+
+<link name="virtual_middle_wheel">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <cylinder radius="${wheelRadius}" length="${wheelWidth}"/>
+        </geometry>
+        <material name="yellow"/>
+    </visual>
+    <inertial>
+        <origin xyz="0 0.0 0" rpy="0 0 0" />
+        <mass value="0.01" />
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+</link>
+
+<joint name="virtual_middle_engine_to_virtual_middle_wheel" type="continuous">
+  <origin xyz="0 0 ${-bottomMotorHeight/2.0}" rpy="0 0 0" />
+  <parent link="virtual_middle_engine" />
+  <child link="virtual_middle_wheel" />
+  <axis xyz="0 1 0" />
+  <limit lower="0" upper="0" effort="${PROPULSION_MAX_EFFORT}" velocity="${PROPULSION_MAX_VELOCITY}" />
+</joint>
+
+<link
+        name="control_link">
+</link>
+
+<joint name="trolley_bottom_to_control_link" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="trolley_bottom" />
+    <child link="control_link" />
+    <axis xyz="0 0 0" />
+</joint>
+
+
+<!-- Transmision -->
+
+<transmission name="left_wheel_steering">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="base_link_to_bottom_motor_left">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="motor3">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="right_wheel_steering">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="base_link_to_bottom_motor_right">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="motor4">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+
+<transmission name="right_wheel_power">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="bottom_motor_right_to_right_wheel">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="motor5">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+    <mechanicalReduction>10</mechanicalReduction>
+  </actuator>
+</transmission>
+
+
+<transmission name="left_wheel_power">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="bottom_motor_left_to_left_wheel">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="motor6">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+    <mechanicalReduction>-10</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="central_cylinder">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="mobile_frame_to_trolley_top">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="motor9">
+    <hardwareInterface>VelocityJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+</robot>
+
