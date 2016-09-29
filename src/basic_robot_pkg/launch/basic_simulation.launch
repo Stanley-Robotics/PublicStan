@@ -1,5 +1,4 @@
 <launch>
-	<include file="$(find basic_robot_pkg)/launch/gazebo_empty_world.launch"/>
 	<include file="$(find basic_robot_pkg)/launch/robot_simplified_into_gazebo.launch"/>
 	 <!-- load the controllers -->
         <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
