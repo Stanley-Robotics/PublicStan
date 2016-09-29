@@ -20,5 +20,14 @@
       </camera>
     </gui>
 
+    <physics name="ode_70iters" type="ode">
+      <real_time_update_rate>1000</real_time_update_rate>
+      <ode>
+        <solver>
+          <iters>200</iters>
+        </solver>
+      </ode>
+    </physics>
+
   </world>
 </sdf>
