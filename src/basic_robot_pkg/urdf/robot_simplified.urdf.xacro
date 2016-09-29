@@ -289,10 +289,12 @@
     <material>Gazebo/Green</material>
 </gazebo>
 
-<joint name="base_link_to_mobile_frame" type="fixed">
+<joint name="base_link_to_mobile_frame" type="prismatic">
     <parent link="base_link"/>
     <child link="mobile_frame"/>
     <origin xyz="${baseDepth/2.0 + mobileFrameDepth/2.0} 0.0 ${-baseHeight/2.0 + mobileFrameHeight/2.0}"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0" upper="0.10" effort="${ELEVATION_MAX_EFFORT}" velocity="${ELEVATION_MAX_VELOCITY}"/>
 </joint>
 <gazebo reference="base_link_to_mobile_frame">
   <disableFixedJointLumping>true</disableFixedJointLumping>
@@ -358,10 +360,12 @@
     <material>Gazebo/Black</material>
 </gazebo>
 
-<joint name="trolley_top_to_trolley_bottom" type="fixed">
+<joint name="trolley_top_to_trolley_bottom" type="prismatic">
     <parent link="trolley_top"/>
     <child link="trolley_bottom"/>
     <origin xyz="${-distanceFromTrolleyTopToTrolleyBottom} 0.0 0.0"/>
+    <axis xyz="0 0 -1" />
+    <limit lower="0" upper="0.1" effort="${ELEVATION_MAX_EFFORT}" velocity="${ELEVATION_MAX_VELOCITY}" />
 </joint>
 <gazebo reference="trolley_top_to_trolley_bottom">
   <disableFixedJointLumping>true</disableFixedJointLumping>
@@ -639,6 +643,29 @@
   <actuator name="motor6">
     <hardwareInterface>VelocityJointInterface</hardwareInterface>
     <mechanicalReduction>-10</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<transmission name="pillow_front">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="base_link_to_mobile_frame">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="motor7">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+
+<transmission name="pillow_back">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="trolley_top_to_trolley_bottom">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="motor8">
+    <hardwareInterface>PositionJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
   </actuator>
 </transmission>
 
