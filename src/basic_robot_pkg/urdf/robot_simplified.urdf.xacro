@@ -153,7 +153,7 @@
     <parent link="base_link"/>
     <child link="bottom_motor_left"/>
     <origin xyz="0.0 ${-baseWidth/2.0 - wheelRadius} ${-baseHeight/2.0 - distanceToTheGround + wheelRadius + bottomMotorHeight/2.0}"/>
-    <axis xyz="0 0 1"/>
+    <axis xyz="0 0 -1"/>
     <limit lower="${-maxInt}" upper="${maxInt}" effort="${DIRECTION_MAX_EFFORT}" velocity="${DIRECTION_MAX_VELOCITY}" />
 </joint>
 <gazebo reference="base_link_to_bottom_motor_left">
@@ -188,7 +188,7 @@
     <parent link="bottom_motor_left"/>
     <child link="left_wheel"/>
     <origin xyz="0.0 0.0 ${-bottomMotorHeight/2.0}"/>
-    <axis xyz="0 1 0"/>
+    <axis xyz="0 -1 0"/>
     <limit lower="0" upper="0" effort="${PROPULSION_MAX_EFFORT}" velocity="${PROPULSION_MAX_VELOCITY}" />
 </joint>
 <gazebo reference="bottom_motor_left_to_left_wheel">
@@ -223,7 +223,7 @@
     <parent link="base_link"/>
     <child link="bottom_motor_right"/>
     <origin xyz="0.0 ${baseWidth/2.0 + wheelRadius} ${-baseHeight/2.0 - distanceToTheGround + wheelRadius + bottomMotorHeight/2.0}"/>
-    <axis xyz="0 0 1"/>
+    <axis xyz="0 0 -1"/>
     <limit lower="${-maxInt}" upper="${maxInt}" effort="${DIRECTION_MAX_EFFORT}" velocity="${DIRECTION_MAX_VELOCITY}" />
 </joint>
 <gazebo reference="base_link_to_bottom_motor_right">
@@ -258,7 +258,7 @@
     <parent link="bottom_motor_right"/>
     <child link="right_wheel"/>
     <origin xyz="0.0 0.0 ${-bottomMotorHeight/2.0}"/>
-    <axis xyz="0 1 0"/>
+    <axis xyz="0 -1 0"/>
     <limit lower="0" upper="0" effort="${PROPULSION_MAX_EFFORT}" velocity="${PROPULSION_MAX_VELOCITY}" />
 </joint>
 <gazebo reference="bottom_motor_right_to_right_wheel">
@@ -558,7 +558,7 @@
   <origin xyz="0 0.0 ${-baseHeight/2.0 - distanceToTheGround + wheelRadius + bottomMotorHeight/2.0}" rpy="0 0 0" />
   <parent link="base_link" />
   <child link="virtual_middle_engine" />
-  <axis xyz="0 1 0" />
+  <axis xyz="0 -1 0" />
   <limit lower="${-maxInt}" upper="${maxInt}" effort="${DIRECTION_MAX_EFFORT}" velocity="${DIRECTION_MAX_VELOCITY}" />
 </joint>
 

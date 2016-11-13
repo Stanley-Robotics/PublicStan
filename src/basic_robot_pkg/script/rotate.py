@@ -6,8 +6,8 @@ import rospy
 rosh.rosh_init()
 
 power = 8.15
-steer1 = 1.73
-steer2 = 1.26
+steer2 = 1.73
+steer1 = 1.26
 
 
 power_cmd = rosh.msg.std_msgs.Float64()
