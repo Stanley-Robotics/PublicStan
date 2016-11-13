@@ -9,6 +9,8 @@
                 right_wheel_power_controller
                 left_wheel_power_controller
                 central_cylinder_controller
+                pillow_front_controller
+                pillow_back_controller
                 "/>
 	<!-- Load joint controller configurations from YAML file to parameter server -->
         <rosparam file="$(find basic_robot_pkg)/config/robot_simplified_control.yaml" command="load"/>
